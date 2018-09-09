@@ -16,7 +16,7 @@ class TodoApp extends React.Component {
       editing: null,
       newTodo: '',
       todos: [],
-      loading: 0
+      loading: 1
     };
   }
 
@@ -80,7 +80,10 @@ class TodoApp extends React.Component {
   }
 
   componentDidMount() {
-    this.loadTodo()
+    // Reset initial loading
+    this.setState({ loading: 0 }, function () {
+      this.loadTodo()
+    })
   }
 
   handleChange(event) {
