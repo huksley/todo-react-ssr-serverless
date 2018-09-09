@@ -42,7 +42,8 @@ const config = {
       { from: "css", to: "css" },
       { from: "dist", to: "dist" },
       { from: "public", to: "public" },
-      "index.html"
+      "index.html",
+      "todo.png"
     ]),
     // Limit chunks to 1 effectively disable chunking (used in dynamic imports)
     // Dos not 

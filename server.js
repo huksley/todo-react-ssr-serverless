@@ -198,6 +198,7 @@ app.post('/api/todo/:id', function (req, res) {
   });
 })
 
+// html
 app.get('/*', (req, res) => {
   const props = {}
   App.default(req.url, props).then((reactComponent) => {

@@ -62,7 +62,34 @@ functions:
     events:
         - http: ANY /
         - http: 'ANY {proxy+}'
-
+        - http:
+            # List all todos
+            path: api/todo
+            method: get
+        - http:
+            # Add new todo
+            path: api/todo
+            method: post
+        - http:
+            # Get one todo
+            path: api/todo/{any+}
+            method: get
+        - http:
+            # Update todo
+            path: api/todo/{any+}
+            method: post
+        - http:
+            # Update todo
+            path: api/todo/{any+}
+            method: delete
+        - http:
+            # Reinit todo db
+            path: api/init
+            method: post
+        - http:
+            # Update todo
+            path: api/todo/{any+}
+            method: post
 plugins:
   - serverless-webpack
   - serverless-domain-manager
