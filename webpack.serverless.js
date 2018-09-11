@@ -16,7 +16,11 @@ const config = {
   node: {
     __dirname: false
   },
-  devtool: serverless.lib.webpack.isLocal ? 'source-map' : 'nosource-source-map',
+  optimization: {
+    // We no not want to minimize our code.
+    minimize: false
+  },
+  devtool: serverless.lib.webpack.isLocal ? 'source-map' : 'source-map',
   externals: [ nodeExternals() ],
   output: {
     libraryTarget: 'commonjs2',
@@ -30,7 +34,19 @@ const config = {
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        loader: require.resolve('babel-loader')
+        use: {
+          loader: require.resolve('babel-loader'),
+          options: {
+            presets: [
+              [ '@babel/env', {
+                  targets: {
+                    node: '8.10'
+                  }
+                }
+              ]
+            ]
+          }
+        }
       }
     ]
   },
