@@ -1,14 +1,14 @@
 {
-  "name": "rrv4-ssr-and-code-splitting",
+  "name": "todo-react-ssr-serverless",
   "version": "0.0.0",
-  "description": "This is a demo of RRv4 with SSR and code splitting.",
-  "main": "index.js",
+  "description": "Isomorphic TodoMVC example in ReactJS with Serverless and DynamoDB",
+  "main": "server.js",
   "scripts": {
     "lint": "eslint ./src",
     "start": "node ./server.js",
     "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "sls": "webpack && sls offline start",
+    "sls": "webpack && sls offline --dontPrintOutput",
     "sls:deploy": "webpack && sls deploy"
   },
   "repository": {
