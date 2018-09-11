@@ -8,14 +8,15 @@ provider:
   runtime: nodejs8.10
   region: eu-west-1
   stage: dev
-  # optional, in MB, default is 1024
-  memorySize: 256
+  # optional, in MB, default is 1024, min 128
+  memorySize: 128
   # optional, in seconds, default is 6
   timeout: 6
   # optional, default is true
   versionFunctions: false
-  # Allow access to DynamoDB in role
+  # IAM custom roles
   iamRoleStatements:
+    # Allow access to DynamoDB in role
     - Effect: Allow
       Action:
         - dynamodb:Query
@@ -25,16 +26,33 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource:
-        - { "Fn::GetAtt": ["TodoDynamoDBTable", "Arn" ] }
+        - { "Fn::GetAtt": [ "TodoDynamoDBTable", "Arn" ] }
+    # Allow publishing message in our own queue
+    - Effect: Allow
+      Action:
+        - sqs:GetQueueAttributes
+        - sqs:SendMessage
+        - sqs:DeleteMessage
+        - sqs:ReceiveMessage
+        - sqs:GetQueueUrl
+      Resource:
+        - { "Fn::GetAtt": [ "TodoEventQueue", "Arn" ] }
+        
   # Define additional env vars for deployment
   environment:
     TODO_TABLE: ${self:custom.todoTable}
+    TODO_EVENT_QUEUE: ${self:custom.todoEventQueue}
+    API_URL: ${self:custom.api_url.${env:CUSTOM_DOMAIN_ENABLED, 'no'}}
 
 custom:
   todoTable: 'todos'
+  todoEventQueue: 'todos-events'
   constants:
     yes: true
     no: false
+  api_url:
+    yes: https://${env:CUSTOM_DOMAIN, 'custom.domain.serverless.com'}/api
+    no: http://localhost:3000/api
   # Make special webpack transpiling for Serverless
   webpack:
     webpackConfig: ./webpack.serverless.js
@@ -60,36 +78,46 @@ functions:
   app:
     handler: server.serverless
     events:
-        - http: ANY /
-        - http: 'ANY {proxy+}'
-        - http:
-            # List all todos
-            path: api/todo
-            method: get
-        - http:
-            # Add new todo
-            path: api/todo
-            method: post
-        - http:
-            # Get one todo
-            path: api/todo/{any+}
-            method: get
-        - http:
-            # Update todo
-            path: api/todo/{any+}
-            method: post
-        - http:
-            # Update todo
-            path: api/todo/{any+}
-            method: delete
-        - http:
-            # Reinit todo db
-            path: api/init
-            method: post
-        - http:
-            # Update todo
-            path: api/todo/{any+}
-            method: post
+      - http: ANY /
+      - http: 'ANY {proxy+}'
+      - http:
+          # List all todos
+          path: api/todo
+          method: get
+      - http:
+          # Get all queue
+          path: api/queue
+          method: get
+      - http:
+          # Add new todo
+          path: api/todo
+          method: post
+      - http:
+          # Get one todo
+          path: api/todo/{any+}
+          method: get
+      - http:
+          # Update todo
+          path: api/todo/{any+}
+          method: post
+      - http:
+          # Update todo
+          path: api/todo/{any+}
+          method: delete
+      - http:
+          # Reinit todo db
+          path: api/init
+          method: post
+  event:
+    handler: server.receiveEvent
+    events:
+      - sqs:
+          # Invoke function once for every message
+          batchSize: 1
+          arn:
+            Fn::GetAtt:
+              - TodoEventQueue
+              - Arn
 plugins:
   - serverless-webpack
   - serverless-domain-manager
@@ -111,3 +139,9 @@ resources:
           ReadCapacityUnits: 3
           WriteCapacityUnits: 3
         TableName: ${self:custom.todoTable}
+    TodoEventQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:custom.todoEventQueue}
+        MessageRetentionPeriod: 1209600
+        VisibilityTimeout: 60
