@@ -47,9 +47,6 @@ provider:
 custom:
   todoTable: 'todos'
   todoEventQueue: 'todos-events'
-  constants:
-    yes: true
-    no: false
   api_url:
     yes: https://${env:CUSTOM_DOMAIN, 'custom.domain.serverless.com'}/api
     no: http://localhost:3000/api
@@ -62,7 +59,7 @@ custom:
   customDomain:
     domainName: ${env:CUSTOM_DOMAIN, 'custom.domain.serverless.com'}
     createRoute53Record: true
-    enabled: ${self:custom.constants.${env:CUSTOM_DOMAIN_ENABLED, 'no'}}
+    enabled: ${env:CUSTOM_DOMAIN_ENABLED, 'false'}
   # Add binary images as handled in API gateway
   apigwBinary:
     types:
