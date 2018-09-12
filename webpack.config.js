@@ -25,9 +25,9 @@ const clientConfig = {
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: [
-          { loader: 'babel-loader' },
-        ]
+        use: {
+          loader: require.resolve('babel-loader')
+        }
       }
     ]
   },
@@ -65,7 +65,19 @@ const serverConfig = {
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        loader: require.resolve('babel-loader')
+        use: {
+          loader: require.resolve('babel-loader'),
+          options: {
+            presets: [
+              [ '@babel/env', {
+                  targets: {
+                    node: '8.10'
+                  }
+                }
+              ]
+            ]
+          }
+        }
       }
     ]
   },
