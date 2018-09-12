@@ -42,14 +42,15 @@ provider:
   environment:
     TODO_TABLE: ${self:custom.todoTable}
     TODO_EVENT_QUEUE: ${self:custom.todoEventQueue}
-    API_URL: ${self:custom.api_url.${env:CUSTOM_DOMAIN_ENABLED, 'no'}}
+    API_URL: ${self:custom.apiUrlByCustomDomain.${env:CUSTOM_DOMAIN_ENABLED, 'false'}}
 
 custom:
   todoTable: 'todos'
   todoEventQueue: 'todos-events'
-  api_url:
-    yes: https://${env:CUSTOM_DOMAIN, 'custom.domain.serverless.com'}/api
-    no: http://localhost:3000/api
+  # Set API_URL by custom domain here
+  apiUrlByCustomDomain:
+    true: https://${env:CUSTOM_DOMAIN, 'custom.domain.serverless.com'}/api
+    false: 'http://localhost:3000/api'
   # Make special webpack transpiling for Serverless
   webpack:
     webpackConfig: ./webpack.serverless.js
