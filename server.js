@@ -259,6 +259,11 @@ process.on('beforeExit', (code) => {
   console.log("NodeJS exiting")
 })
 
+process.on('SIGINT', _ => {
+  console.log("Caught interrupt signal")
+  process.exit(1)
+})
+
 module.exports.serverless = serverless(app, {
   binary: headers => {
     let ct = headers['content-type']
