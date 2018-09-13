@@ -1,10 +1,11 @@
 const path = require('path');
 const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const entry = './src/entry.jsx';
 const outputPath = path.resolve('./dist');
-const publicPath = '/dist/';
+const publicPath = process.env.PUBLIC_PATH || '/';
 const resolve = {
   extensions: ['.js', '.jsx'],
 };
@@ -28,11 +29,42 @@ const clientConfig = {
         use: {
           loader: require.resolve('babel-loader')
         }
+      },
+      {
+        test: /\.(gif|png|jpe?g|svg)$/i,
+        use: [
+          'file-loader',
+          {
+            loader: 'image-webpack-loader',
+            options: {
+              bypassOnDebug: true
+            }
+          }
+        ]
       }
     ]
   },
   resolve,
   plugins: [
+    // Copy all used resources (no dir available)
+    new CopyWebpackPlugin([
+      { from: "assets", to: "assets" },
+      { from: "css", to: "css" },
+      { from: "public" },
+      { from: "index.html", to: "index.html", transform: (content) => {
+          if (process.env.PUBLIC_PATH) {
+            let path = process.env.PUBLIC_PATH;
+            if (path.endsWith("/")) {
+              path = path.substring(0, path.length - 1);
+            }
+            return String(content).replace(/{{CDN}}/g, path);
+          } else {
+            // Don`t use CDN
+            return String(content).replace(/{{CDN}}\//g, "");
+          }
+        }
+      }
+    ]),
     // During the build make literal replacements on client side for 
     // process.env.API_URL, because there is no process.env
     new webpack.DefinePlugin({
@@ -78,6 +110,18 @@ const serverConfig = {
             ]
           }
         }
+      },
+      {
+        test: /\.(gif|png|jpe?g|svg)$/i,
+        use: [
+          'file-loader',
+          {
+            loader: 'image-webpack-loader',
+            options: {
+              bypassOnDebug: true
+            }
+          }
+        ]
       }
     ]
   },
@@ -85,6 +129,25 @@ const serverConfig = {
   plugins: [
     // Assume runs last
     new CleanWebpackPlugin('dist/*.*'),
+    // Copy all used resources (no dir available)
+    new CopyWebpackPlugin([
+      { from: "assets", to: "assets" },
+      { from: "css", to: "css" },
+      { from: "public" },
+      { from: "index.html", to: "index.html", transform: (content) => {
+          if (process.env.PUBLIC_PATH) {
+            let path = process.env.PUBLIC_PATH;
+            if (path.endsWith("/")) {
+              path = path.substring(0, path.length - 1);
+            }
+            return String(content).replace(/{{CDN}}/g, path);
+          } else {
+            // Don`t use CDN
+            return String(content).replace(/{{CDN}}\//g, "");
+          }
+        }
+      }
+    ]),
     // Limit chunks to 1 effectively disable chunking (used in dynamic imports)
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1

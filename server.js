@@ -7,7 +7,7 @@ const App = require('./dist/index.server.bundle.js')
 const bodyParser = require('body-parser')
 const AWS = require('aws-sdk')
 const app = express()
-const template = fs.readFileSync(`${__dirname}/index.html`, 'utf8'); // stupid simple template.
+const template = fs.readFileSync(`${__dirname}/dist/index.html`, 'utf8') // stupid simple template.
 const port = process.env.SERVER_PORT || 3000
 const tableName = process.env.TODO_TABLE || 'todos'
 const eventQueueName = process.env.TODO_EVENT_QUEUE || 'todos-events'
@@ -40,14 +40,13 @@ app.set('etag', false)
 // Always send last-modified as current time
 app.get('/*', function(req, res, next){ 
   res.setHeader('Last-Modified', (new Date()).toUTCString())
-  next(); 
+  next()
 })
 
-// express.static was only working for some requests, but not others.
-app.use('/dist', express.static(`${__dirname}/dist`, { etag: false }))
-app.use('/css', express.static(`${__dirname}/css`, { etag: false }))
-// root files
-app.use(express.static(`${__dirname}/public`, { etag: false }))
+// Static files (disable etag)
+app.use(express.static(`${__dirname}/dist`, { etag: false, index: false }))
+app.use('/assets', express.static(`${__dirname}/dist/assets`, { etag: false }))
+app.use('/css', express.static(`${__dirname}/dist/css`, { etag: false }))
 
 // Obtain record
 app.get('/api/todo/:id', function (req, res) {
@@ -142,7 +141,7 @@ app.post('/api/todo', async function (req, res) {
     return
   }
 
-  completed = !!completed; // convert to boolean
+  completed = !!completed // convert to boolean
 
   const params = {
     TableName: tableName,
@@ -205,7 +204,7 @@ app.post('/api/todo/:id', function (req, res) {
     res.status(400).json({ error: 'id in body must match id in url' })
   }
 
-  completed = !!completed; // convert to boolean
+  completed = !!completed // convert to boolean
 
   const params = {
     TableName: tableName,
@@ -255,6 +254,10 @@ if (process.env.AWS_EXECUTION_ENV !== undefined) {
     })
   }
 }
+
+process.on('beforeExit', (code) => {
+  console.log("NodeJS exiting")
+})
 
 module.exports.serverless = serverless(app, {
   binary: headers => {
