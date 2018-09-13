@@ -58,10 +58,23 @@ For proper paths, you __MUST__ define custom domain.
 CUSTOM_DOMAIN=todo.domain.com CUSTOM_DOMAIN_ENABLED=yes API_URL=https://todo.domain.com/api npm run sls:deploy
 ```
 
+For properly serving binary files you __MUST__ use bucket for static files (created automatically by serverless)
+
+```
+PUBLIC_PATH=https://s3-eu-west-1.amazonaws.com/todocdn.domain.com/ \
+  CDN_BUCKET=todocdn.domain.com \
+  CUSTOM_DOMAIN=todo.domain.com \
+  CUSTOM_DOMAIN_ENABLED=yes \
+  API_URL=https://todo.domain.com/api \
+  npm run sls:deploy
+```
+
 ## Isomorphic!
 
 Thanks to matchRoutes/renderRoutes from `react-router-config` after HTML is received, route state are restored and 
 all links start to work client side. 
+
+FIXME: This isomorphic/universal stuff should be updated according to recent improvements in react-router.
 
 ![todo](./todo.png)
 

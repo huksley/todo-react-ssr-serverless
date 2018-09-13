@@ -1,4 +1,4 @@
-The following files in this directory are taken verbatim from TodoMVC project:
+The following files in this directory were taken from TodoMVC project:
 
  - base.css
  - index.css

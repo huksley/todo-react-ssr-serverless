@@ -6,7 +6,7 @@ service: todo
 provider:
   name: aws
   runtime: nodejs8.10
-  region: eu-west-1
+  region: ${env:AWS_REGION, 'eu-west-1'}
   stage: dev
   # optional, in MB, default is 1024, min 128
   memorySize: 128
@@ -47,6 +47,8 @@ provider:
 custom:
   todoTable: 'todos'
   todoEventQueue: 'todos-events'
+  # If set, CDN bucket will be created
+  cdnBucketName: ${env:CDN_BUCKET, ''}
   # Set API_URL by custom domain here
   apiUrlByCustomDomain:
     true: https://${env:CUSTOM_DOMAIN, 'custom.domain.serverless.com'}/api
@@ -67,6 +69,15 @@ custom:
       - 'image/*'
       - 'application/font*'
       - 'application/pdf'
+  s3Sync:
+    - bucketName: ${self:custom.cdnBucketName, 'undefined'}
+      localDir: ./dist
+      acl: public-read
+      followSymlinks: true
+      defaultContentType: application/octet-stream
+      params:
+        - "*.*":
+            CacheControl: 'no-cache'
 
 package:
   exclude:
@@ -121,8 +132,15 @@ plugins:
   - serverless-domain-manager
   - serverless-apigw-binary
   - serverless-offline
+  - serverless-s3-sync
 
 resources:
+  Conditions:
+    CreateCdnBucket:
+      Fn::Not:
+        - Fn::Equals:
+          - ${self:custom.cdnBucketName, ''}
+          - ''
   Resources:
     TodoDynamoDBTable:
       Type: 'AWS::DynamoDB::Table'
@@ -143,3 +161,12 @@ resources:
         QueueName: ${self:custom.todoEventQueue}
         MessageRetentionPeriod: 1209600
         VisibilityTimeout: 60
+    CdnBucket:
+      Type: AWS::S3::Bucket
+      Condition: CreateCdnBucket
+      Properties:
+        BucketName: ${self:custom.cdnBucketName, 'undefined'}
+        AccessControl: PublicRead
+        WebsiteConfiguration:
+          IndexDocument: index.html
+          ErrorDocument: index.html

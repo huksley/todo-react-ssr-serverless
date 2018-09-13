@@ -4,6 +4,7 @@ import TodoFooter from './footer';
 import utils from './utils';
 import fetch from 'cross-fetch';
 import swearjar from 'swearjar';
+import { Logo } from '../assets';
 
 const ENTER_KEY = 13;
 const API_URL = process.env.API_URL || "http://localhost:3000/api";
@@ -205,6 +206,7 @@ class TodoApp extends React.Component {
       <div>
         <header className="header">
           <h1>
+            <img src={Logo}/>
             todos
             { this.state.loading > 0 ? <div className="spinner"></div> : <span/> }
           </h1>
