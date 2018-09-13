@@ -55,11 +55,7 @@ const config = {
   plugins: [
     // Copy all used resources (no dir available)
     new CopyWebpackPlugin([
-      { from: "css", to: "css" },
-      { from: "dist", to: "dist" },
-      { from: "public", to: "public" },
-      "index.html",
-      "todo.png"
+      { from: "dist", to: "dist" }
     ]),
     // Limit chunks to 1 effectively disable chunking (used in dynamic imports)
     // Dos not 
