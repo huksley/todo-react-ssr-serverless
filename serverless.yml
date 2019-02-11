@@ -8,6 +8,8 @@ provider:
   runtime: nodejs8.10
   region: ${env:AWS_REGION, 'eu-west-1'}
   stage: dev
+  stackTags:
+    STACK: "todo"
   # optional, in MB, default is 1024, min 128
   memorySize: 128
   # optional, in seconds, default is 6
