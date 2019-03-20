@@ -8,7 +8,8 @@
     "start": "webpack && node ./server.js",
     "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "sls": "webpack && sls offline --dontPrintOutput",
+    "sls": "sls",
+    "sls:dev": "webpack && sls offline --dontPrintOutput",
     "sls:deploy": "webpack && sls deploy"
   },
   "repository": {

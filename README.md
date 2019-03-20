@@ -49,23 +49,25 @@ npm run sls:deploy
 
 For proper paths, you __MUST__ define custom domain.
 
-  * Create/transfer domain in/to Route53
-  * Verify domain ownership
-  * Create *.domain certificate request in CloudFront Global (N. Virginia)
-  * Wait for it verifaction
+  * Create/transfer yourdomain.com in/to Route53
+  * Verify yourdomain.com ownership
+  * Create *.yourdomain.com certificate request in CloudFront Global (N. Virginia)
+  * Wait for it verification
+  
+Run once to deploy domain:
 
 ```
-CUSTOM_DOMAIN=todo.domain.com CUSTOM_DOMAIN_ENABLED=yes API_URL=https://todo.domain.com/api npm run sls:deploy
+CUSTOM_DOMAIN=todo.domain.com CUSTOM_DOMAIN_ENABLED=true API_URL=https://todo.yourdomain.com/api npm run sls create_domain
 ```
 
-For properly serving binary files you __MUST__ use bucket for static files (created automatically by serverless)
+To properly serve assets you can use bucket for static files (created automatically by serverless)
 
 ```
-PUBLIC_PATH=https://s3-eu-west-1.amazonaws.com/todocdn.domain.com/ \
-  CDN_BUCKET=todocdn.domain.com \
-  CUSTOM_DOMAIN=todo.domain.com \
+PUBLIC_PATH=https://s3-eu-west-1.amazonaws.com/todocdn.yourdomain.com/ \
+  CDN_BUCKET=todocdn.yourdomain.com \
+  CUSTOM_DOMAIN=todo.yourdomain.com \
   CUSTOM_DOMAIN_ENABLED=true \
-  API_URL=https://todo.domain.com/api \
+  API_URL=https://todo.yourdomain.com/api \
   npm run sls:deploy
 ```
 
