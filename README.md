@@ -64,7 +64,7 @@ For properly serving binary files you __MUST__ use bucket for static files (crea
 PUBLIC_PATH=https://s3-eu-west-1.amazonaws.com/todocdn.domain.com/ \
   CDN_BUCKET=todocdn.domain.com \
   CUSTOM_DOMAIN=todo.domain.com \
-  CUSTOM_DOMAIN_ENABLED=yes \
+  CUSTOM_DOMAIN_ENABLED=true \
   API_URL=https://todo.domain.com/api \
   npm run sls:deploy
 ```

@@ -84,6 +84,7 @@ custom:
 package:
   exclude:
     - tmp/**
+    - node_modules/aws_sdk/**
 
 functions:
   app:
